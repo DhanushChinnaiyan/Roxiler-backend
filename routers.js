@@ -64,7 +64,7 @@ router.get("/transactions", async (req, res) => {
       .skip((page - 1) * 10)
       .limit(limit);
 
-    if (!isNaN(search) && search !== "") return res.status(200).json({ products: data });
+    if (!isNaN(search) && search !== "") return res.status(200).json({ totalProductsCount:4,products: data });
 
     
     res.status(200).json({
