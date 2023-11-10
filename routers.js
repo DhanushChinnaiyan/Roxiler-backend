@@ -36,20 +36,13 @@ router.get("/transactions", async (req, res) => {
     const { page, search, month } = req.query;
 
     // Filtering
-    let query = {
-        $expr: {
-          $eq: [{ $month: "$dateOfSale" }, parseFloat(month)],
-        },
-      },
+    let query = {},
       option = {},
       limit = 10;
     if (search) {
       if (!isNaN(search)) {
         query = {
           price: { $lte: parseFloat(search) },
-          $expr: {
-            $eq: [{ $month: "$dateOfSale" }, parseFloat(month)],
-          },
         };
 
         option = { price: -1 };
@@ -57,9 +50,6 @@ router.get("/transactions", async (req, res) => {
       } else {
         query = {
           $text: { $search: search, $caseSensitive: false },
-          $expr: {
-            $eq: [{ $month: "$dateOfSale" }, parseFloat(month)],
-          },
         };
 
         option = { score: { $meta: "textScore" } };
