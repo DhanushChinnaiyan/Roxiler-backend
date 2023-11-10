@@ -33,16 +33,23 @@ router.get("/fetching", async (req, res) => {
 // Get all products
 router.get("/transactions", async (req, res) => {
   try {
-    const { page, search } = req.query;
+    const { page, search, month } = req.query;
 
     // Filtering
-    let query = {},
+    let query = {
+        $expr: {
+          $eq: [{ $month: "$dateOfSale" }, parseFloat(month)],
+        },
+      },
       option = {},
       limit = 10;
     if (search) {
       if (!isNaN(search)) {
         query = {
           price: { $lte: parseFloat(search) },
+          $expr: {
+            $eq: [{ $month: "$dateOfSale" }, parseFloat(month)],
+          },
         };
 
         option = { price: -1 };
@@ -50,6 +57,9 @@ router.get("/transactions", async (req, res) => {
       } else {
         query = {
           $text: { $search: search, $caseSensitive: false },
+          $expr: {
+            $eq: [{ $month: "$dateOfSale" }, parseFloat(month)],
+          },
         };
 
         option = { score: { $meta: "textScore" } };
@@ -57,16 +67,15 @@ router.get("/transactions", async (req, res) => {
     }
 
     const totalProductsCount = await Products.countDocuments(query);
-    
 
     const data = await Products.find(query)
       .sort(option)
       .skip((page - 1) * 10)
       .limit(limit);
 
-    if (!isNaN(search) && search !== "") return res.status(200).json({ totalProductsCount:4,products: data });
+    if (!isNaN(search) && search !== "")
+      return res.status(200).json({ totalProductsCount: 4, products: data });
 
-    
     res.status(200).json({
       totalProductsCount,
       products: data,
