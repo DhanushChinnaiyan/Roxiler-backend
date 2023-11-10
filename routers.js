@@ -57,7 +57,7 @@ router.get("/transactions", async (req, res) => {
     }
 
     const totalProductsCount = await Products.countDocuments(query);
-    const totalPage = Math.ceil(totalProductsCount / 10);
+    
 
     const data = await Products.find(query)
       .sort(option)
@@ -68,7 +68,7 @@ router.get("/transactions", async (req, res) => {
 
     
     res.status(200).json({
-      totalPage,
+      totalProductsCount,
       products: data,
     });
   } catch (error) {
